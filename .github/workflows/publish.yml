@@ -29,5 +29,5 @@ jobs:
 
       - name: Publicar no Orchestrator
         run: |
-          ${{ github.workspace }}\uipathcli\uipath.exe orchestrator packages upload --help
+          ${{ github.workspace }}\uipathcli\uipath.exe orchestrator --help
         shell: pwsh
