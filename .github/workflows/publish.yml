@@ -32,7 +32,7 @@ jobs:
           ${{ github.workspace }}\uipathcli\uipath.exe orchestrator packages upload `
             --organization "${{ secrets.UIPATH_ACCOUNT_NAME }}" `
             --tenant "${{ secrets.UIPATH_TENANT_NAME }}" `
-            --folder "${{ secrets.UIPATH_FOLDER }}" `
+            --folder-name "${{ secrets.UIPATH_FOLDER }}" `
             --pat "${{ secrets.UIPATH_PAT }}" `
             --path "${{ github.workspace }}\output\*.nupkg"
         shell: pwsh
