@@ -23,8 +23,9 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.uipath"
           $lines = @(
+            "---",
             "profiles:",
-            "  default:",
+            "  - name: default",
             "    organization: ${{ secrets.UIPATH_ACCOUNT_NAME }}",
             "    tenant: ${{ secrets.UIPATH_TENANT_NAME }}",
             "    auth:",
