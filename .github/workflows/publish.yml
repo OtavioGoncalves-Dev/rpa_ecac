@@ -14,16 +14,15 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Instalar UiPath CLI
-        run: |
-          Invoke-WebRequest "https://github.com/UiPath/uipathcli/releases/latest/download/uipathcli-windows-amd64.zip" -OutFile "uipathcli.zip"
-          Expand-Archive -Force -Path "uipathcli.zip" -DestinationPath "."
+        # Substituímos o download manual pela ferramenta dotnet, que é mais estável
+        run: dotnet tool install --global UiPath.CLI.Windows
         shell: pwsh
 
       - name: Configurar UiPath CLI
         run: |
           New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.uipath"
+          # CORREÇÃO: Adicionado o "-" antes de name para criar uma lista (sequence)
           $lines = @(
-            "---",
             "profiles:",
             "  - name: default",
             "    organization: ${{ secrets.UIPATH_ACCOUNT_NAME }}",
@@ -36,7 +35,7 @@ jobs:
 
       - name: Pack projeto UiPath
         run: |
-          dotnet tool install --global UiPath.CLI.Windows
+          # Usando o comando uipcli instalado via dotnet tool
           uipcli package pack project.json `
             --output "${{ github.workspace }}\output" `
             --version "1.0.${{ github.run_number }}"
@@ -44,9 +43,8 @@ jobs:
 
       - name: Publicar no Orchestrator
         run: |
-          .\uipath orchestrator packages upload `
-            --organization ${{ secrets.UIPATH_ACCOUNT_NAME }} `
-            --tenant ${{ secrets.UIPATH_TENANT_NAME }} `
+          # Removido o ".\" pois agora usamos o comando global e o perfil default
+          uipcli orchestrator packages upload `
             --folder "${{ secrets.UIPATH_FOLDER }}" `
             --path "${{ github.workspace }}\output\*.nupkg"
         shell: pwsh
