@@ -13,38 +13,26 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v3
 
-      - name: Instalar UiPath CLI
-        # Substituímos o download manual pela ferramenta dotnet, que é mais estável
-        run: dotnet tool install --global UiPath.CLI.Windows
-        shell: pwsh
-
-      - name: Configurar UiPath CLI
-        run: |
-          New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.uipath"
-          # CORREÇÃO: Adicionado o "-" antes de name para criar uma lista (sequence)
-          $lines = @(
-            "profiles:",
-            "  - name: default",
-            "    organization: ${{ secrets.UIPATH_ACCOUNT_NAME }}",
-            "    tenant: ${{ secrets.UIPATH_TENANT_NAME }}",
-            "    auth:",
-            "      pat: ${{ secrets.UIPATH_PAT }}"
-          )
-          $lines | Out-File "$env:USERPROFILE\.uipath\config" -Encoding utf8
-        shell: pwsh
-
       - name: Pack projeto UiPath
         run: |
-          # Usando o comando uipcli instalado via dotnet tool
+          dotnet tool install --global UiPath.CLI.Windows
           uipcli package pack project.json `
             --output "${{ github.workspace }}\output" `
             --version "1.0.${{ github.run_number }}"
         shell: pwsh
 
+      - name: Instalar uipathcli
+        run: |
+          Invoke-WebRequest "https://github.com/UiPath/uipathcli/releases/latest/download/uipathcli-windows-amd64.zip" -OutFile "uipathcli.zip"
+          Expand-Archive -Force -Path "uipathcli.zip" -DestinationPath "${{ github.workspace }}\uipathcli"
+        shell: pwsh
+
       - name: Publicar no Orchestrator
         run: |
-          # Removido o ".\" pois agora usamos o comando global e o perfil default
-          uipcli orchestrator packages upload `
+          ${{ github.workspace }}\uipathcli\uipath.exe orchestrator packages upload `
+            --organization "${{ secrets.UIPATH_ACCOUNT_NAME }}" `
+            --tenant "${{ secrets.UIPATH_TENANT_NAME }}" `
             --folder "${{ secrets.UIPATH_FOLDER }}" `
+            --pat "${{ secrets.UIPATH_PAT }}" `
             --path "${{ github.workspace }}\output\*.nupkg"
         shell: pwsh
