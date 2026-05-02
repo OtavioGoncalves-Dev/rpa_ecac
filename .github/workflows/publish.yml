@@ -33,6 +33,6 @@ jobs:
             -A "${{ secrets.UIPATH_ACCOUNT_NAME }}" `
             -I "${{ secrets.UIPATH_APP_ID }}" `
             -S "${{ secrets.UIPATH_APP_SECRET }}" `
-            --applicationScope "OR.Execution OR.Folders OR.Folders.Read" `
+            --applicationScope "OR.Execution OR.Execution.Read OR.Execution.Write OR.Folders OR.Folders.Read OR.Folders.Write" `
             -o "${{ secrets.UIPATH_FOLDER }}"
         shell: pwsh
