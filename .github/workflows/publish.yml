@@ -28,10 +28,11 @@ jobs:
       - name: Publicar no Orchestrator
         run: |
           uipcli package deploy "${{ github.workspace }}\output\*.nupkg" `
-            --accountName "${{ secrets.UIPATH_ACCOUNT_NAME }}" `
-            --tenantName "${{ secrets.UIPATH_TENANT_NAME }}" `
-            --applicationId "${{ secrets.UIPATH_APP_ID }}" `
-            --applicationSecret "${{ secrets.UIPATH_APP_SECRET }}" `
+            "https://cloud.uipath.com/${{ secrets.UIPATH_ACCOUNT_NAME }}/${{ secrets.UIPATH_TENANT_NAME }}/orchestrator_" `
+            "${{ secrets.UIPATH_TENANT_NAME }}" `
+            -A "${{ secrets.UIPATH_ACCOUNT_NAME }}" `
+            -I "${{ secrets.UIPATH_APP_ID }}" `
+            -S "${{ secrets.UIPATH_APP_SECRET }}" `
             --applicationScope "OR.Execution OR.Folders OR.Folders.Read" `
-            --organizationUnit "${{ secrets.UIPATH_FOLDER }}"
+            -o "${{ secrets.UIPATH_FOLDER }}"
         shell: pwsh
