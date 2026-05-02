@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Pack projeto UiPath
         run: |
@@ -19,12 +19,6 @@ jobs:
           uipcli package pack project.json `
             --output "${{ github.workspace }}\output" `
             --version "1.0.${{ github.run_number }}"
-        shell: pwsh
-
-      - name: Instalar uipathcli
-        run: |
-          Invoke-WebRequest "https://github.com/UiPath/uipathcli/releases/latest/download/uipathcli-windows-amd64.zip" -OutFile "uipathcli.zip"
-          Expand-Archive -Force -Path "uipathcli.zip" -DestinationPath "${{ github.workspace }}\uipathcli"
         shell: pwsh
 
       - name: Publicar no Orchestrator
