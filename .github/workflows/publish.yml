@@ -1,4 +1,4 @@
-name: Publish UiPath Package 
+name: Publish UiPath Package
 
 on:
   push:
@@ -15,11 +15,26 @@ jobs:
 
       - name: Instalar UiPath CLI
         run: |
-          dotnet tool install --global UiPath.CLI.Windows
+          Invoke-WebRequest "https://github.com/UiPath/uipathcli/releases/latest/download/uipathcli-windows-amd64.zip" -OutFile "uipathcli.zip"
+          Expand-Archive -Force -Path "uipathcli.zip" -DestinationPath "."
+        shell: pwsh
+
+      - name: Configurar UiPath CLI
+        run: |
+          mkdir -p "$env:USERPROFILE\.uipath"
+          @"
+          profiles:
+            default:
+              organization: ${{ secrets.UIPATH_ACCOUNT_NAME }}
+              tenant: ${{ secrets.UIPATH_TENANT_NAME }}
+              auth:
+                pat: ${{ secrets.UIPATH_PAT }}
+          "@ | Out-File "$env:USERPROFILE\.uipath\config" -Encoding utf8
         shell: pwsh
 
       - name: Pack projeto UiPath
         run: |
+          dotnet tool install --global UiPath.CLI.Windows
           uipcli package pack project.json `
             --output "${{ github.workspace }}\output" `
             --version "1.0.${{ github.run_number }}"
@@ -27,10 +42,9 @@ jobs:
 
       - name: Publicar no Orchestrator
         run: |
-          uipcli package deploy "${{ github.workspace }}\output\*.nupkg" `
-            "https://cloud.uipath.com/${{ secrets.UIPATH_ACCOUNT_NAME }}/${{ secrets.UIPATH_TENANT_NAME }}/orchestrator_" `
-            "${{ secrets.UIPATH_TENANT_NAME }}" `
-            -t "${{ secrets.UIPATH_PAT }}" `
-            -a "${{ secrets.UIPATH_ACCOUNT_NAME }}" `
-            -o "${{ secrets.UIPATH_FOLDER }}"
+          .\uipath orchestrator packages upload `
+            --organization ${{ secrets.UIPATH_ACCOUNT_NAME }} `
+            --tenant ${{ secrets.UIPATH_TENANT_NAME }} `
+            --folder "${{ secrets.UIPATH_FOLDER }}" `
+            --path "${{ github.workspace }}\output\*.nupkg"
         shell: pwsh
