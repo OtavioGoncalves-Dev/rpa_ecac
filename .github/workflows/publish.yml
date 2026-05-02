@@ -22,8 +22,15 @@ jobs:
       - name: Configurar UiPath CLI
         run: |
           New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.uipath"
-          $config = "profiles:`n  default:`n    organization: ${{ secrets.UIPATH_ACCOUNT_NAME }}`n    tenant: ${{ secrets.UIPATH_TENANT_NAME }}`n    auth:`n      pat: ${{ secrets.UIPATH_PAT }}"
-          $config | Out-File "$env:USERPROFILE\.uipath\config" -Encoding utf8
+          $lines = @(
+            "profiles:",
+            "  default:",
+            "    organization: ${{ secrets.UIPATH_ACCOUNT_NAME }}",
+            "    tenant: ${{ secrets.UIPATH_TENANT_NAME }}",
+            "    auth:",
+            "      pat: ${{ secrets.UIPATH_PAT }}"
+          )
+          $lines | Out-File "$env:USERPROFILE\.uipath\config" -Encoding utf8
         shell: pwsh
 
       - name: Pack projeto UiPath
