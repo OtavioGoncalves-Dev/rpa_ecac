@@ -1,0 +1,37 @@
+name: Publish UiPath Package
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Instalar UiPath CLI
+        run: |
+          dotnet tool install --global UiPath.CLI.Windows
+        shell: pwsh
+
+      - name: Pack projeto UiPath
+        run: |
+          uipcli package pack project.json `
+            --output "${{ github.workspace }}\output" `
+            --version "1.0.${{ github.run_number }}"
+        shell: pwsh
+
+      - name: Publicar no Orchestrator
+        run: |
+          uipcli package deploy "${{ github.workspace }}\output\*.nupkg" `
+            --accountName "${{ secrets.UIPATH_ACCOUNT_NAME }}" `
+            --tenantName "${{ secrets.UIPATH_TENANT_NAME }}" `
+            --applicationId "${{ secrets.UIPATH_APP_ID }}" `
+            --applicationSecret "${{ secrets.UIPATH_APP_SECRET }}" `
+            --applicationScope "OR.Execution OR.Folders OR.Folders.Read" `
+            --organizationUnit "${{ secrets.UIPATH_FOLDER }}"
+        shell: pwsh
