@@ -30,9 +30,7 @@ jobs:
           uipcli package deploy "${{ github.workspace }}\output\*.nupkg" `
             "https://cloud.uipath.com/${{ secrets.UIPATH_ACCOUNT_NAME }}/${{ secrets.UIPATH_TENANT_NAME }}/orchestrator_" `
             "${{ secrets.UIPATH_TENANT_NAME }}" `
-            -A "${{ secrets.UIPATH_ACCOUNT_NAME }}" `
-            -I "${{ secrets.UIPATH_APP_ID }}" `
-            -S "${{ secrets.UIPATH_APP_SECRET }}" `
-            --applicationScope "OR.Execution OR.Execution.Read OR.Execution.Write OR.Folders OR.Folders.Read OR.Folders.Write" `
+            -t "${{ secrets.UIPATH_PAT }}" `
+            -a "${{ secrets.UIPATH_ACCOUNT_NAME }}" `
             -o "${{ secrets.UIPATH_FOLDER }}"
         shell: pwsh
