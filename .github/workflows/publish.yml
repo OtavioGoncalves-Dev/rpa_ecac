@@ -1,4 +1,4 @@
-name: Publish UiPath Package
+name: Publish UiPath Package 
 
 on:
   push:
