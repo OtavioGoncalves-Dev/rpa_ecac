@@ -29,5 +29,10 @@ jobs:
 
       - name: Publicar no Orchestrator
         run: |
-          ${{ github.workspace }}\uipathcli\uipath.exe orchestrator libraries upload-package --help
+          $token = "${{ secrets.UIPATH_PAT }}"
+          $file = Get-Item "${{ github.workspace }}\output\*.nupkg"
+          $uri = "https://cloud.uipath.com/${{ secrets.UIPATH_ACCOUNT_NAME }}/${{ secrets.UIPATH_TENANT_NAME }}/orchestrator_/odata/Processes/UiPath.Server.Configuration.OData.UploadPackage"
+          $headers = @{ Authorization = "Bearer $token" }
+          $form = @{ file = Get-Item $file.FullName }
+          Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Form $form
         shell: pwsh
